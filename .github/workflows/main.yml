@@ -1,24 +1,47 @@
-name: Build
+name: Build Kernel Nethunter d2s
 
-on: [push]
+on:
+  push:
+    branches: [ cruel ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-        
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: env setup
-        run: sudo apt-get update --fix-missing && sudo apt-get install bc bison build-essential zstd clang flex gnupg gperf ccache liblz4-tool libncurses5-dev libsdl1.2-dev libstdc++6 libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zlib1g-dev libncurses5-dev bzip2 git gcc g++ libssl-dev openssl python3 -y && sudo apt-get install gcc-aarch64-linux-gnu && sudo apt-get install gcc-arm-linux-gnueabihf&& sudo apt-get install lld&& sudo apt-get install gcc-arm-linux-gnueabi
-        
-      - name: build
-        env:
-          token: ${{ secrets.TOKEN }}
-        run: chmod +x build.sh && ./build.sh "${token}"
-
-    
     strategy:
       matrix:
-        model: [ "N975F" ]
+        model: [N975F]  # d2s = N975F
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update -y && sudo apt-get install -y build-essential bc flex bison libssl-dev
+
+      - name: Kernel Configure
+        run: |
+          chmod +x cruelbuild
+          ./cruelbuild config \
+            model=${{ matrix.model }} \
+            name="Nethunter-OneUI4.1" \
+            toolchain=proton \
+            +magisk \
+            +nohardening \
+            +wireguard \
+            +cifs \
+            +sdfat \
+            +ntfs \
+            +morosound \
+            +boeffla_wl_blocker \
+            os_patch_level=2099-12
+
+      - name: Build Kernel
+        run: ./cruelbuild build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nethunter-d2s-OneUI4.1-boot
+          path: build/boot.img
         
