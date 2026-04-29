@@ -19,15 +19,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y build-essential bc flex bison libssl-dev python3
+          sudo apt-get install -y build-essential bc flex bison libssl-dev python3 git
 
       - name: Create dummy adb
         run: |
-          # Buat file tiruan adb yang mengeluarkan "d2s"
           sudo tee /usr/local/bin/adb <<< '#!/bin/bash'
           sudo tee -a /usr/local/bin/adb <<< 'echo "d2s"'
           sudo chmod +x /usr/local/bin/adb
-          # Pastikan adb bisa dipanggil
           adb
 
       - name: Kernel Configure
@@ -36,7 +34,7 @@ jobs:
           ./cruelbuild config \
             model=${{ matrix.model }} \
             name="Nethunter-OneUI4.1" \
-            toolchain=clang \
+            toolchain=proton \
             +magisk \
             +nohardening \
             +wireguard \
