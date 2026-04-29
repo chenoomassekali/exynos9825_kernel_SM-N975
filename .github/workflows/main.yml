@@ -29,19 +29,23 @@ jobs:
 
       - name: Prepare build files
         run: |
-          # Cari file build.mkbootimg yang tersedia (bisa .d2s atau polos)
+          # Buat folder cruel jika belum ada
+          mkdir -p cruel
+          # Cari file build.mkbootimg yang tersedia (d2s atau polos)
           if [ -f cruel/build.mkbootimg.d2s ]; then
             cp cruel/build.mkbootimg.d2s cruel/build.mkbootimg.N975F
-            echo "Copied build.mkbootimg.d2s to build.mkbootimg.N975F"
+            echo "Copied build.mkbootimg.d2s"
           elif [ -f cruel/build.mkbootimg ]; then
             cp cruel/build.mkbootimg cruel/build.mkbootimg.N975F
-            echo "Copied build.mkbootimg to build.mkbootimg.N975F"
+            echo "Copied build.mkbootimg"
           else
-            echo "WARNING: No mkbootimg file found. Creating dummy file."
+            # Buat file dummy agar build tetap berjalan
             echo "# Dummy mkbootimg for N975F" > cruel/build.mkbootimg.N975F
+            echo "WARNING: Dummy file created"
           fi
-          # Pastikan file berhasil dibuat
+          # Tampilkan isi file untuk verifikasi
           ls -la cruel/build.mkbootimg.N975F
+          cat cruel/build.mkbootimg.N975F
 
       - name: Kernel Configure
         run: |
